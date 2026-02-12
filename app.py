@@ -163,7 +163,7 @@ def create_download_button(fig, filename):
     )
 
 def plot_accuracy(y_true, y_pred, r2, mse):
-    fig, ax = plt.subplots(figsize=(5, 4))
+    fig, ax = plt.subplots(figsize=(4, 4))
     ax.scatter(y_true, y_pred, alpha=0.5, label='Data Points', color='blue')
     min_val = min(np.min(y_true), np.min(y_pred))
     max_val = max(np.max(y_true), np.max(y_pred))
@@ -180,11 +180,11 @@ def plot_accuracy(y_true, y_pred, r2, mse):
 
 def plot_strain_vs_elastic(df):
     temps = sorted(df['Temperature (°C)'].unique())
-    fig, ax = plt.subplots(figsize=(7, 5)) 
+    fig, ax = plt.subplots(figsize=(6, 4)) 
     
     for t in temps:
         subset = df[df['Temperature (°C)'] == t]
-        ax.plot(subset['Strain Rate (1/s)'], subset['Elastic Modulus (MPa)'], label=str(t), marker='o', markersize=3)
+        ax.plot(subset['Strain Rate (1/s)'], subset['Elastic Modulus (MPa)'], label=str(t))
     
     ax.set_xscale('log')
     ax.set_xlabel(r'Strain Rate (s$^{-1}$)')
@@ -197,7 +197,7 @@ def plot_strain_vs_elastic(df):
     return fig
 
 def plot_temp_vs_elastic(df):
-    fig, ax = plt.subplots(figsize=(7, 5))
+    fig, ax = plt.subplots(figsize=(6, 4))
     unique_rates = sorted(df['Strain Rate (1/s)'].unique(), reverse=True)
     
     for rate in unique_rates:
@@ -420,7 +420,7 @@ def main():
                 
                 Z_grid_fine = griddata(points, values, (X_grid_fine, Y_grid_fine), method='cubic')
                 
-                fig = plt.figure(figsize=(6, 4))
+                fig = plt.figure(figsize=(10, 5))
                 ax = fig.add_subplot(111, projection='3d')
                 surf = ax.plot_surface(X_grid_fine, Y_grid_fine, Z_grid_fine, cmap='rainbow', edgecolor='none', alpha=0.8)
                 ax.set_xlabel('Temperature (°C)')
@@ -428,10 +428,11 @@ def main():
                 ax.set_yticks(Y_rates_log)
                 ax.set_yticklabels([f"$10^{{{int(y)}}}$" for y in Y_rates_log])
                 ax.set_zlabel('Elastic Modulus (MPa)')
-                fig.colorbar(surf, ax=ax, shrink=0.5, aspect=20)
+                fig.colorbar(surf, ax=ax, shrink=0.5, aspect=30)
                 st.pyplot(fig)
                 create_download_button(fig, "3d_surface_plot.png")
 
 if __name__ == "__main__":
     main()
+
 
