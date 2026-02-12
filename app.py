@@ -20,7 +20,7 @@ import io  # Added for in-memory image handling
 st.set_page_config(page_title="Material Analysis Tool", layout="wide")
 
 plt.rcParams['font.family'] = 'Times New Roman'
-plt.rcParams['font.size'] = 12
+plt.rcParams['font.size'] = 10
 
 # Compatibility checks
 try:
@@ -264,7 +264,7 @@ def main():
             ax.set_xscale('log')
             ax.set_xlabel('Frequency (Hz)')
             ax.set_ylabel('Storage Modulus (MPa)')
-            ax.legend(bbox_to_anchor=(1.01, 1), loc='upper left')
+            ax.legend(bbox_to_anchor=(1.03, 1), loc='upper left')
             ax.margins(x=0) 
             st.pyplot(fig)
             create_download_button(fig, "raw_data_plot.png")
@@ -435,6 +435,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
