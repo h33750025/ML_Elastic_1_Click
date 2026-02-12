@@ -14,6 +14,7 @@ import os
 import time
 import tempfile
 import threading
+import io  # Added for in-memory image handling
 
 # --- 1. GLOBAL SETTINGS & STYLING ---
 st.set_page_config(page_title="Material Analysis Tool", layout="wide")
@@ -148,6 +149,19 @@ class StreamlitCallback(Callback):
             self.status_text.text(f"Training Progress: {int(p*100)}% | Loss: {loss:.4f}")
 
 # --- 4. PLOTTING HELPERS ---
+
+def create_download_button(fig, filename):
+    """Converts a matplotlib figure to a PNG byte stream and creates a download button."""
+    buf = io.BytesIO()
+    fig.savefig(buf, format='png', dpi=300, bbox_inches='tight')
+    buf.seek(0)
+    st.download_button(
+        label=f"Download Plot ({filename})",
+        data=buf,
+        file_name=filename,
+        mime="image/png"
+    )
+
 def plot_accuracy(y_true, y_pred, r2, mse):
     fig, ax = plt.subplots(figsize=(6, 4))
     ax.scatter(y_true, y_pred, alpha=0.5, label='Data Points', color='blue')
@@ -166,7 +180,6 @@ def plot_accuracy(y_true, y_pred, r2, mse):
 
 def plot_strain_vs_elastic(df):
     temps = sorted(df['Temperature (°C)'].unique())
-    # Slightly wider figure to accommodate outside legend
     fig, ax = plt.subplots(figsize=(7, 4)) 
     
     for t in temps:
@@ -178,12 +191,8 @@ def plot_strain_vs_elastic(df):
     ax.set_ylabel('Elastic Modulus (MPa)')
     ax.set_title("Strain Rate vs. Elastic Modulus")
     
-    # 1. REMOVE GAPS
     ax.margins(x=0) 
-    
-    # 2. LEGEND OUTSIDE
     ax.legend(title='Temperature (°C)', bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0.)
-    
     plt.tight_layout()
     return fig
 
@@ -200,12 +209,8 @@ def plot_temp_vs_elastic(df):
     ax.set_ylabel('Elastic Modulus (MPa)')
     ax.set_title("Temperature vs. Elastic Modulus")
     
-    # 1. REMOVE GAPS
     ax.margins(x=0)
-    
-    # 2. LEGEND OUTSIDE
     ax.legend(title=r'Strain Rate (s$^{-1}$)', bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0.)
-    
     plt.tight_layout()
     return fig
 
@@ -261,6 +266,7 @@ def main():
             ax.set_ylabel('Storage Modulus (MPa)')
             ax.legend(bbox_to_anchor=(1.01, 1), loc='upper left')
             st.pyplot(fig)
+            create_download_button(fig, "raw_data_plot.png")
 
     # 2. Results Containers
     status_container = st.empty()
@@ -318,6 +324,7 @@ def main():
                     st.subheader("1. Training Accuracy")
                     fig_acc = plot_accuracy(y, y_pred, r2, mse)
                     st.pyplot(fig_acc)
+                    create_download_button(fig_acc, "accuracy_plot.png")
 
                 status_text.text("Training Complete. Starting Prediction Integration...")
                 
@@ -359,6 +366,7 @@ def main():
             res = st.session_state.train_results
             fig_acc = plot_accuracy(res['y_true'], res['y_pred'], res['r2'], res['mse'])
             st.pyplot(fig_acc)
+            create_download_button(fig_acc, "accuracy_plot.png")
 
     if st.session_state.pred_results is not None:
         with final_results_container:
@@ -384,11 +392,13 @@ def main():
             with ptab1:
                 fig_strain = plot_strain_vs_elastic(st.session_state.pred_results)
                 st.pyplot(fig_strain)
+                create_download_button(fig_strain, "strain_rate_vs_modulus.png")
             
             # Tab 2: Temp vs Modulus
             with ptab2:
                 fig_temp = plot_temp_vs_elastic(st.session_state.pred_results)
                 st.pyplot(fig_temp)
+                create_download_button(fig_temp, "temp_vs_modulus.png")
 
             # Tab 3: 3D Surface
             with ptab3:
@@ -420,6 +430,7 @@ def main():
                 ax.set_zlabel('Elastic Modulus (MPa)')
                 fig.colorbar(surf, ax=ax, shrink=0.5, aspect=20)
                 st.pyplot(fig)
+                create_download_button(fig, "3d_surface_plot.png")
 
 if __name__ == "__main__":
     main()
