@@ -166,15 +166,46 @@ def plot_accuracy(y_true, y_pred, r2, mse):
 
 def plot_strain_vs_elastic(df):
     temps = sorted(df['Temperature (°C)'].unique())
-    fig, ax = plt.subplots(figsize=(6, 4))
+    # Slightly wider figure to accommodate outside legend
+    fig, ax = plt.subplots(figsize=(7, 4)) 
+    
     for t in temps:
         subset = df[df['Temperature (°C)'] == t]
         ax.plot(subset['Strain Rate (1/s)'], subset['Elastic Modulus (MPa)'], label=str(t), marker='o', markersize=3)
+    
     ax.set_xscale('log')
     ax.set_xlabel(r'Strain Rate (s$^{-1}$)')
     ax.set_ylabel('Elastic Modulus (MPa)')
     ax.set_title("Strain Rate vs. Elastic Modulus")
-    ax.legend(title='Temperature (°C)', bbox_to_anchor=(1.02, 1), loc='upper left')
+    
+    # 1. REMOVE GAPS
+    ax.margins(x=0) 
+    
+    # 2. LEGEND OUTSIDE
+    ax.legend(title='Temperature (°C)', bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0.)
+    
+    plt.tight_layout()
+    return fig
+
+def plot_temp_vs_elastic(df):
+    fig, ax = plt.subplots(figsize=(7, 4))
+    unique_rates = sorted(df['Strain Rate (1/s)'].unique(), reverse=True)
+    
+    for rate in unique_rates:
+        subset = df[df['Strain Rate (1/s)'] == rate].sort_values(by='Temperature (°C)')
+        exponent = int(np.round(np.log10(rate)))
+        ax.plot(subset['Temperature (°C)'], subset['Elastic Modulus (MPa)'], label=fr"$10^{{{exponent}}}$")
+    
+    ax.set_xlabel('Temperature (°C)')
+    ax.set_ylabel('Elastic Modulus (MPa)')
+    ax.set_title("Temperature vs. Elastic Modulus")
+    
+    # 1. REMOVE GAPS
+    ax.margins(x=0)
+    
+    # 2. LEGEND OUTSIDE
+    ax.legend(title=r'Strain Rate (s$^{-1}$)', bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0.)
+    
     plt.tight_layout()
     return fig
 
@@ -216,7 +247,7 @@ def main():
     # MAIN AREA
     # ==========================================
 
-    # 1. Visualization of Input Data (Always show if data exists)
+    # 1. Visualization of Input Data
     if st.session_state.shared_df is not None:
         with st.expander("Raw Data Visualization", expanded=(st.session_state.train_results is None)):
             df = st.session_state.shared_df
@@ -232,7 +263,6 @@ def main():
             st.pyplot(fig)
 
     # 2. Results Containers
-    # We use empty containers to populate them in specific order during execution
     status_container = st.empty()
     accuracy_container = st.container()
     prediction_status_container = st.empty()
@@ -323,9 +353,6 @@ def main():
     # ==========================================
     # DISPLAY RESULTS (PERSISTENT)
     # ==========================================
-    # If we have results in state (either just ran, or persistent from before), display them.
-    
-    # 1. Ensure Accuracy Graph stays visible if we didn't just run it
     if st.session_state.train_results is not None and not start_btn:
         with accuracy_container:
             st.subheader("1. Training Accuracy")
@@ -333,7 +360,6 @@ def main():
             fig_acc = plot_accuracy(res['y_true'], res['y_pred'], res['r2'], res['mse'])
             st.pyplot(fig_acc)
 
-    # 2. Show Prediction Results
     if st.session_state.pred_results is not None:
         with final_results_container:
             st.divider()
@@ -352,27 +378,19 @@ def main():
 
             # Prediction Graphs
             st.subheader("2. Prediction Results")
-            
-            # Create tabs, but put the Strain Rate graph FIRST as requested
             ptab1, ptab2, ptab3 = st.tabs(["Strain Rate vs Modulus", "Temp vs Modulus", "3D Surface"])
             
+            # Tab 1: Strain Rate vs Modulus
             with ptab1:
                 fig_strain = plot_strain_vs_elastic(st.session_state.pred_results)
                 st.pyplot(fig_strain)
             
+            # Tab 2: Temp vs Modulus
             with ptab2:
-                res_df = st.session_state.pred_results
-                fig, ax = plt.subplots(figsize=(6, 4))
-                unique_rates = sorted(res_df['Strain Rate (1/s)'].unique(), reverse=True)
-                for rate in unique_rates:
-                    subset = res_df[res_df['Strain Rate (1/s)'] == rate].sort_values(by='Temperature (°C)')
-                    exponent = int(np.round(np.log10(rate)))
-                    ax.plot(subset['Temperature (°C)'], subset['Elastic Modulus (MPa)'], label=fr"$10^{{{exponent}}}$")
-                ax.set_xlabel('Temperature (°C)')
-                ax.set_ylabel('Elastic Modulus (MPa)')
-                ax.legend(title=r'Strain Rate (s$^{-1}$)')
-                st.pyplot(fig)
+                fig_temp = plot_temp_vs_elastic(st.session_state.pred_results)
+                st.pyplot(fig_temp)
 
+            # Tab 3: 3D Surface
             with ptab3:
                 res_df = st.session_state.pred_results
                 pivot_df = res_df.pivot(index='Strain Rate (1/s)', columns='Temperature (°C)', values='Elastic Modulus (MPa)')
