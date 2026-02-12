@@ -163,7 +163,7 @@ def create_download_button(fig, filename):
     )
 
 def plot_accuracy(y_true, y_pred, r2, mse):
-    fig, ax = plt.subplots(figsize=(4, 4))
+    fig, ax = plt.subplots(figsize=(6, 5))
     ax.scatter(y_true, y_pred, alpha=0.5, label='Data Points', color='blue')
     min_val = min(np.min(y_true), np.min(y_pred))
     max_val = max(np.max(y_true), np.max(y_pred))
@@ -180,7 +180,7 @@ def plot_accuracy(y_true, y_pred, r2, mse):
 
 def plot_strain_vs_elastic(df):
     temps = sorted(df['Temperature (°C)'].unique())
-    fig, ax = plt.subplots(figsize=(6, 4)) 
+    fig, ax = plt.subplots(figsize=(7, 5)) 
     
     for t in temps:
         subset = df[df['Temperature (°C)'] == t]
@@ -192,12 +192,12 @@ def plot_strain_vs_elastic(df):
     ax.set_title("Strain Rate vs. Elastic Modulus")
     
     ax.margins(x=0) 
-    ax.legend(title='Temperature (°C)', bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0.)
+    ax.legend(title='Temperature (°C)', bbox_to_anchor=(1.01, 1), loc='upper left', borderaxespad=0.)
     plt.tight_layout()
     return fig
 
 def plot_temp_vs_elastic(df):
-    fig, ax = plt.subplots(figsize=(6, 4))
+    fig, ax = plt.subplots(figsize=(7, 5))
     unique_rates = sorted(df['Strain Rate (1/s)'].unique(), reverse=True)
     
     for rate in unique_rates:
@@ -210,7 +210,7 @@ def plot_temp_vs_elastic(df):
     ax.set_title("Temperature vs. Elastic Modulus")
     
     ax.margins(x=0)
-    ax.legend(title=r'Strain Rate (s$^{-1}$)', bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0.)
+    ax.legend(title=r'Strain Rate (s$^{-1}$)', bbox_to_anchor=(1.01, 1), loc='upper left', borderaxespad=0.)
     plt.tight_layout()
     return fig
 
@@ -420,7 +420,7 @@ def main():
                 
                 Z_grid_fine = griddata(points, values, (X_grid_fine, Y_grid_fine), method='cubic')
                 
-                fig = plt.figure(figsize=(10, 5))
+                fig = plt.figure(figsize=(12, 8))
                 ax = fig.add_subplot(111, projection='3d')
                 surf = ax.plot_surface(X_grid_fine, Y_grid_fine, Z_grid_fine, cmap='rainbow', edgecolor='none', alpha=0.8)
                 ax.set_xlabel('Temperature (°C)')
@@ -434,5 +434,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
