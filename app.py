@@ -171,6 +171,7 @@ def plot_accuracy(y_true, y_pred, r2, mse):
     ax.set_xlabel('Actual Values')
     ax.set_ylabel('Predicted Values')
     ax.set_title('Training Accuracy')
+    ax.margins(x=0) 
     textstr = f'R² = {r2:.4f}\nMSE = {mse:.4f}'
     ax.text(0.05, 0.95, textstr, transform=ax.transAxes, fontsize=10,
             verticalalignment='top', bbox=dict(facecolor='white', alpha=0.5))
@@ -265,6 +266,7 @@ def main():
             ax.set_xlabel('Frequency (Hz)')
             ax.set_ylabel('Storage Modulus (MPa)')
             ax.legend(bbox_to_anchor=(1.01, 1), loc='upper left')
+            ax.margins(x=0) 
             st.pyplot(fig)
             create_download_button(fig, "raw_data_plot.png")
 
@@ -434,6 +436,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
