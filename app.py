@@ -171,10 +171,9 @@ def plot_accuracy(y_true, y_pred, r2, mse):
     ax.set_xlabel('Actual Values')
     ax.set_ylabel('Predicted Values')
     ax.set_title('Training Accuracy')
-    ax.margins(x=0) 
     textstr = f'R² = {r2:.4f}\nMSE = {mse:.4f}'
     ax.text(0.05, 0.95, textstr, transform=ax.transAxes, fontsize=10,
-            verticalalignment='top', bbox=dict(facecolor='white', alpha=0.5))
+            verticalalignment='top')
     ax.legend()
     plt.tight_layout()
     return fig
@@ -436,6 +435,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
