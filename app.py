@@ -156,14 +156,14 @@ def create_download_button(fig, filename):
     fig.savefig(buf, format='png', dpi=300, bbox_inches='tight')
     buf.seek(0)
     st.download_button(
-        label=f"Download Plot ({filename})",
+        label=f"Download Plot",
         data=buf,
         file_name=filename,
         mime="image/png"
     )
 
 def plot_accuracy(y_true, y_pred, r2, mse):
-    fig, ax = plt.subplots(figsize=(6, 4))
+    fig, ax = plt.subplots(figsize=(5, 4))
     ax.scatter(y_true, y_pred, alpha=0.5, label='Data Points', color='blue')
     min_val = min(np.min(y_true), np.min(y_pred))
     max_val = max(np.max(y_true), np.max(y_pred))
@@ -180,7 +180,7 @@ def plot_accuracy(y_true, y_pred, r2, mse):
 
 def plot_strain_vs_elastic(df):
     temps = sorted(df['Temperature (°C)'].unique())
-    fig, ax = plt.subplots(figsize=(7, 4)) 
+    fig, ax = plt.subplots(figsize=(7, 5)) 
     
     for t in temps:
         subset = df[df['Temperature (°C)'] == t]
@@ -197,7 +197,7 @@ def plot_strain_vs_elastic(df):
     return fig
 
 def plot_temp_vs_elastic(df):
-    fig, ax = plt.subplots(figsize=(7, 4))
+    fig, ax = plt.subplots(figsize=(7, 5))
     unique_rates = sorted(df['Strain Rate (1/s)'].unique(), reverse=True)
     
     for rate in unique_rates:
@@ -257,7 +257,7 @@ def main():
         with st.expander("Raw Data Visualization", expanded=(st.session_state.train_results is None)):
             df = st.session_state.shared_df
             temps = sorted(df['Temperature'].unique())
-            fig, ax = plt.subplots(figsize=(8, 4))
+            fig, ax = plt.subplots(figsize=(6, 4))
             for t in temps:
                 subset = df[df['Temperature'] == t].sort_values(by='Frequency')
                 ax.plot(subset['Frequency'], subset['Storage Modulus'], label=f"{t} °C")
@@ -420,7 +420,7 @@ def main():
                 
                 Z_grid_fine = griddata(points, values, (X_grid_fine, Y_grid_fine), method='cubic')
                 
-                fig = plt.figure(figsize=(8, 6))
+                fig = plt.figure(figsize=(6, 4))
                 ax = fig.add_subplot(111, projection='3d')
                 surf = ax.plot_surface(X_grid_fine, Y_grid_fine, Z_grid_fine, cmap='rainbow', edgecolor='none', alpha=0.8)
                 ax.set_xlabel('Temperature (°C)')
@@ -434,3 +434,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
